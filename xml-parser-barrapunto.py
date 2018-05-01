@@ -14,6 +14,7 @@
 from xml.sax.handler import ContentHandler
 from xml.sax import make_parser
 import sys
+from urllib import request
 
 class myContentHandler(ContentHandler):
 
@@ -38,11 +39,11 @@ class myContentHandler(ContentHandler):
             if name == 'title':
                 line = "Title: " + self.theContent + "."
                 # To avoid Unicode trouble
-                print(line.encode('utf-8'))
+                print(str(line.encode('utf-8')))
                 self.inContent = False
                 self.theContent = ""
             elif name == 'link':
-                print(" Link: " + self.theContent + ".")
+                print(" Link: " + str(self.theContent) + ".")
                 self.inContent = False
                 self.theContent = ""
 
@@ -52,10 +53,10 @@ class myContentHandler(ContentHandler):
 
 # --- Main prog
 
-if len(sys.argv)<2:
-    print("Usage: python xml-parser-barrapunto.py <document>")
+if len(sys.argv) < 2:
+    print("Usage: python xml-parser-barrapunto.py <document/URL>")
     print()
-    print(" <document>: file name of the document to parse")
+    print(" <document/URL>: file name of the document or URL  to parse")
     sys.exit(1)
 
 # Load parser and driver
@@ -65,8 +66,19 @@ theHandler = myContentHandler()
 theParser.setContentHandler(theHandler)
 
 # Ready, set, go!
-
-xmlFile = open(sys.argv[1],"r")
-theParser.parse(xmlFile)
-
+def createOutputFile():
+    file = open("parsed.html", "w")
+    file.write("")
+    file.close
+try:
+    xmlFile = open(sys.argv[1],"r")
+    createOutputFile()
+    theParser.parse(xmlFile)
+except FileNotFoundError:
+    try:
+        xmlFile = request.urlopen(sys.argv[1])
+        theParser.parse(xmlFile)
+    except ValueError:
+        print("URL or file not found")
+        sys.exit(1)
 print("Parse complete")
