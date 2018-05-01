@@ -68,7 +68,7 @@ theParser.setContentHandler(theHandler)
 # Ready, set, go!
 def createOutputFile():
     file = open("parsed.html", "w")
-    file.write("")
+    file.write("<html><body><h1>Parsing result:<br></html></body></h1>")
     file.close
 try:
     xmlFile = open(sys.argv[1],"r")
@@ -77,6 +77,7 @@ try:
 except FileNotFoundError:
     try:
         xmlFile = request.urlopen(sys.argv[1])
+        createOutputFile()
         theParser.parse(xmlFile)
     except ValueError:
         print("URL or file not found")
