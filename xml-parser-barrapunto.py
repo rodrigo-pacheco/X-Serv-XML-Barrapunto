@@ -37,13 +37,17 @@ class myContentHandler(ContentHandler):
             self.inItem = False
         elif self.inItem:
             if name == 'title':
-                line = "Title: " + self.theContent + "."
+                # line = "Title: " + self.theContent + "."
                 # To avoid Unicode trouble
-                print(str(line.encode('utf-8')))
+                self.title = self.theContent
+                # print(str(line.encode('utf-8')))
                 self.inContent = False
                 self.theContent = ""
             elif name == 'link':
-                print(" Link: " + str(self.theContent) + ".")
+                element = "<a href=" + self.theContent + ">" + self.title + "</a><br>"
+                file = open("parsed.html", "a")
+                file.write(element)
+                file.close
                 self.inContent = False
                 self.theContent = ""
 
@@ -68,7 +72,7 @@ theParser.setContentHandler(theHandler)
 # Ready, set, go!
 def createOutputFile():
     file = open("parsed.html", "w")
-    file.write("<html><body><h1>Parsing result:<br></html></body></h1>")
+    file.write("<html><body><h1>Parsing result:<br></h1>")
     file.close
 try:
     xmlFile = open(sys.argv[1],"r")
@@ -82,4 +86,8 @@ except FileNotFoundError:
     except ValueError:
         print("URL or file not found")
         sys.exit(1)
+
+file = open("parsed.html", "a")
+file.write("</html></body>")
+file.close
 print("Parse complete")
